@@ -68,5 +68,48 @@ class WmClientTest extends AnyFlatSpec with Matchers {
     assert(_client.getStaticCaps.length > 0)
     _client.destroyConnection()
   }
+  it should "throw Wm exception if WM server is not configured correctly" in {
+    assertThrows[WmException] {
+      WmClient.apply("http", "localhost", "18080", "")
+    }
+  }
+
+    it should "throw Wm exception if WM server host parameter is missing" in {
+      assertThrows[WmException] {
+        WmClient.apply("http", "", "8080", "")
+      }
+    }
+
+  it should "throw Wm exception if all server connection values are missing" in {
+    assertThrows[WmException] {
+      WmClient.apply("", "", "", "")
+    }
+  }
+
+  it should "retrieve WM server info" in {
+    _client = createTestClient()
+    val jsonInfoData = _client.getInfo()
+    assert(jsonInfoData != null)
+    assert(jsonInfoData.getWurflInfo.length > 0)
+    assert(jsonInfoData.getStaticCaps.length > 0)
+    assert(jsonInfoData.getVirtualCaps.length > 0)
+    _client.destroyConnection()
+  }
+
+  it should "perform a device detection using a User-Agent as input" in {
+    _client = createTestClient()
+    val ua = "Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-G950F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.2 Chrome/51.0.2704.106 Mobile Safari/537.36"
+    val device = _client.lookupUseragent(ua)
+    assert(device != null)
+    val capabilities = device.capabilities
+    val dcount = capabilities.size
+    assert(dcount >= 40)
+
+    assert("SM-G950F" == capabilities.get("model_name"))
+    assert("true" == capabilities.get("is_smartphone"))
+    assert("false" == capabilities.get("is_smarttv"))
+
+
+  }
 
 }
