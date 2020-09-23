@@ -22,7 +22,7 @@ class WmClientTest extends AnyFlatSpec with Matchers {
   import com.scientiamobile.wurfl.wmclient.WmException
   import org.apache.commons.lang.StringUtils
 
-  var _client:WmClient = null
+  var _client: WmClient = null
 
   @BeforeClass
   @throws[WmException]
@@ -74,11 +74,11 @@ class WmClientTest extends AnyFlatSpec with Matchers {
     }
   }
 
-    it should "throw Wm exception if WM server host parameter is missing" in {
-      assertThrows[WmException] {
-        WmClient.apply("http", "", "8080", "")
-      }
+  it should "throw Wm exception if WM server host parameter is missing" in {
+    assertThrows[WmException] {
+      WmClient.apply("http", "", "8080", "")
     }
+  }
 
   it should "throw Wm exception if all server connection values are missing" in {
     assertThrows[WmException] {
@@ -108,7 +108,38 @@ class WmClientTest extends AnyFlatSpec with Matchers {
     assert("SM-G950F" == capabilities.get("model_name"))
     assert("true" == capabilities.get("is_smartphone"))
     assert("false" == capabilities.get("is_smarttv"))
+    _client.destroyConnection()
 
+    it should "perform a device detection using a User-Agent as input requesting a specific set of capabilities" in {
+      val reqCaps = Array("brand_name", "model_name", "physical_screen_width", "device_os", "is_android", "is_ios", "is_app")
+      _client = createTestClient()
+      _client.setRequestedCapabilities(reqCaps)
+      val ua = "Mozilla/5.0 (Nintendo Switch; WebApplet) AppleWebKit/601.6 (KHTML, like Gecko) NF/4.0.0.5.9 NintendoBrowser/5.1.0.13341"
+      val device = _client.lookupUseragent(ua)
+      assert(device != null)
+      val capabilities = device.capabilities
+      assert(capabilities != null)
+      assert("Nintendo" == capabilities.get("brand_name"))
+      assert("Switch" == capabilities.get("model_name"))
+      assert("false" == capabilities.get("is_android"))
+      assert(8 == capabilities.size)
+      _client.destroyConnection()
+    }
+
+    it should "return a generic device when an empty user-agent is passed" in {
+      _client = createTestClient()
+      try {
+        val device = _client.lookupUseragent("")
+        assert(device != null)
+        assert(device.capabilities.get("wurfl_id") == "generic")
+      } catch {
+        case e: WmException =>
+          fail(e.getMessage)
+      }
+      finally {
+        _client.destroyConnection()
+      }
+    }
 
   }
 
