@@ -157,4 +157,53 @@ class WmClientTest extends AnyFlatSpec with Matchers {
     }
   }
 
+  it should "perform a device detection using a wurfl_id as input" in {
+    _client = createTestClient()
+    val device = _client.lookupDeviceId("nokia_generic_series40")
+    assert(device != null)
+    val capabilities = device.capabilities
+    assert(capabilities != null)
+    // num caps + num vcaps + wurfl id
+    assert(capabilities.size >= 40)
+    assert("false" == capabilities.get("is_android"))
+    assert("128" == capabilities.get("resolution_width"))
+    _client.destroyConnection()
+  }
+
+  it should "perform a device detection using a wurfl_id as input and a list of requested capabilities as a filter" in {
+    _client = createTestClient()
+    val reqCaps = Array("brand_name", "is_smarttv")
+    val reqvCaps = Array("is_app", "is_app_webview")
+    _client.setRequestedStaticCapabilities(reqCaps)
+    _client.setRequestedVirtualCapabilities(reqvCaps)
+    val device = _client.lookupDeviceId("generic_opera_mini_version1")
+    assert(device != null)
+    val capabilities = device.capabilities
+    assert(capabilities != null)
+    assert("Opera" == capabilities.get("brand_name"))
+    assert("false" == capabilities.get("is_smarttv"))
+    assert(5 == capabilities.size)
+    _client.destroyConnection()
+  }
+
+  it should "return an exception if a non existing wurfl_id is passed to lookupDeviceId " in {
+    _client = createTestClient()
+    var exc: Boolean = false
+    try _client.lookupDeviceId("nokia_generic_series40_wrong")
+    catch {
+      case e: WmException =>
+        exc = true
+        assert(e.getMessage.contains("device is missing"))
+    }
+
+    it should "return an exception if a null wurfl_id is passed to lookupDeviceId " in {
+      _client = createTestClient()
+      var exc: Boolean = false
+      try _client.lookupDeviceId(null)
+      catch {
+        case e: WmException =>
+          exc = true
+          assert(e.getMessage.contains("device is missing"))
+      }
+    }
 }
