@@ -110,37 +110,51 @@ class WmClientTest extends AnyFlatSpec with Matchers {
     assert("false" == capabilities.get("is_smarttv"))
     _client.destroyConnection()
 
-    it should "perform a device detection using a User-Agent as input requesting a specific set of capabilities" in {
-      val reqCaps = Array("brand_name", "model_name", "physical_screen_width", "device_os", "is_android", "is_ios", "is_app")
-      _client = createTestClient()
-      _client.setRequestedCapabilities(reqCaps)
-      val ua = "Mozilla/5.0 (Nintendo Switch; WebApplet) AppleWebKit/601.6 (KHTML, like Gecko) NF/4.0.0.5.9 NintendoBrowser/5.1.0.13341"
-      val device = _client.lookupUseragent(ua)
+  }
+  it should "perform a device detection using a User-Agent as input requesting a specific set of capabilities" in {
+    val reqCaps = Array("brand_name", "model_name", "physical_screen_width", "device_os", "is_android", "is_ios", "is_app")
+    _client = createTestClient()
+    _client.setRequestedCapabilities(reqCaps)
+    val ua = "Mozilla/5.0 (Nintendo Switch; WebApplet) AppleWebKit/601.6 (KHTML, like Gecko) NF/4.0.0.5.9 NintendoBrowser/5.1.0.13341"
+    val device = _client.lookupUseragent(ua)
+    assert(device != null)
+    val capabilities = device.capabilities
+    assert(capabilities != null)
+    assert("Nintendo" == capabilities.get("brand_name"))
+    assert("Switch" == capabilities.get("model_name"))
+    assert("false" == capabilities.get("is_android"))
+    assert(8 == capabilities.size)
+    _client.destroyConnection()
+  }
+
+  it should "return a generic device when an empty user-agent is passed" in {
+    _client = createTestClient()
+    try {
+      val device = _client.lookupUseragent("")
       assert(device != null)
-      val capabilities = device.capabilities
-      assert(capabilities != null)
-      assert("Nintendo" == capabilities.get("brand_name"))
-      assert("Switch" == capabilities.get("model_name"))
-      assert("false" == capabilities.get("is_android"))
-      assert(8 == capabilities.size)
+      assert(device.capabilities.get("wurfl_id") == "generic")
+    } catch {
+      case e: WmException =>
+        fail(e.getMessage)
+    }
+    finally {
       _client.destroyConnection()
     }
+  }
 
-    it should "return a generic device when an empty user-agent is passed" in {
-      _client = createTestClient()
-      try {
-        val device = _client.lookupUseragent("")
-        assert(device != null)
-        assert(device.capabilities.get("wurfl_id") == "generic")
-      } catch {
-        case e: WmException =>
-          fail(e.getMessage)
-      }
-      finally {
-        _client.destroyConnection()
-      }
+  it should "return a generic device when a null user-agent is passed" in {
+    _client = createTestClient()
+    try {
+      val device = _client.lookupUseragent(null)
+      assert(device != null)
+      assert(device.capabilities.get("wurfl_id") == "generic")
+    } catch {
+      case e: WmException =>
+        fail(e.getMessage)
     }
-
+    finally {
+      _client.destroyConnection()
+    }
   }
 
 }
