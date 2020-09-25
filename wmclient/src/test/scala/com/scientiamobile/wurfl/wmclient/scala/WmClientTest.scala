@@ -195,6 +195,7 @@ class WmClientTest extends AnyFlatSpec with Matchers {
         exc = true
         assert(e.getMessage.contains("device is missing"))
     }
+  }
 
     it should "return an exception if a null wurfl_id is passed to lookupDeviceId " in {
       _client = createTestClient()
