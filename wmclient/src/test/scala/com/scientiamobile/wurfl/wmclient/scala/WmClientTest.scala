@@ -14,6 +14,7 @@ package com.scientiamobile.wurfl.wmclient.scala
 
 import java.io.{BufferedReader, UnsupportedEncodingException}
 import java.security.Principal
+import java.util
 import java.util.Locale
 
 import javax.servlet.{RequestDispatcher, ServletInputStream}
@@ -225,7 +226,7 @@ class WmClientTest extends AnyFlatSpec with Matchers {
       }
     }
 
-  it should "perform a device detection using a HttpServletRequest object as input" in {
+  it should "perform a device detection using a HttpServletRequest object as input " in {
 
     _client = createTestClient()
     val request = createTestRequest(true)
@@ -241,6 +242,85 @@ class WmClientTest extends AnyFlatSpec with Matchers {
     assert("Nintendo" == capabilities.get("advertised_device_os"))
     assert("Nintendo Switch" == capabilities.get("complete_device_name"))
     assert("nintendo_switch_ver1" == capabilities.get("wurfl_id"))
+    _client.destroyConnection()
+  }
+
+  it should "perform a device detection using a HttpServletRequest object as input and a filter with a set of required capabilities" in {
+    _client = createTestClient()
+    val reqCaps = Array("is_mobile", "form_factor", "is_app", "complete_device_name", "advertised_device_os", "brand_name")
+    _client.setRequestedCapabilities(reqCaps)
+    val device = _client.lookupRequest(createTestRequest(true))
+    val capabilities = device.capabilities
+    assert(capabilities != null)
+    assert(7 == capabilities.size)
+    assert("false" == capabilities.get("is_app"))
+    assert("Nintendo" == capabilities.get("advertised_device_os"))
+    assert("Nintendo Switch" == capabilities.get("complete_device_name"))
+    assert("nintendo_switch_ver1" == capabilities.get("wurfl_id"))
+    _client.destroyConnection()
+  }
+
+  it should "perform a device detection using a header map as input" in {
+    _client = createTestClient()
+    val headers = new util.HashMap[String,String]()
+    headers.put("User-Agent".toLowerCase, "Mozilla/5.0 (Nintendo Switch; WebApplet) AppleWebKit/601.6 (KHTML, like Gecko) NF/4.0.0.5.9 NintendoBrowser/5.1.0.13341")
+    headers.put("Content-Type".toLowerCase, "gzip, deflate")
+    headers.put("Accept-Encoding".toLowerCase, "application/json")
+    headers.put("X-UCBrowser-Device-UA".toLowerCase, "Mozilla/5.0 (Nintendo Switch; ShareApplet) AppleWebKit/601.6 (KHTML, like Gecko) NF/4.0.0.5.9 NintendoBrowser/5.1.0.13341")
+    headers.put("Device-Stock-UA".toLowerCase, "Mozilla/5.0 (Nintendo Switch; WifiWebAuthApplet) AppleWebKit/601.6 (KHTML, like Gecko) NF/4.0.0.5.9 NintendoBrowser/5.1.0.13341")
+    val device = _client.lookupHeaders(headers)
+    assert(device != null)
+    val capabilities = device.capabilities
+    assert(capabilities != null)
+    assert(capabilities.size >= 40)
+    assert("Smart-TV" == capabilities.get("form_factor"))
+    assert("5.1.0.13341" == capabilities.get("advertised_browser_version"))
+    assert("false" == capabilities.get("is_app"))
+    assert("false" == capabilities.get("is_app_webview"))
+    assert("Nintendo" == capabilities.get("advertised_device_os"))
+    assert("Nintendo Switch" == capabilities.get("complete_device_name"))
+    assert("nintendo_switch_ver1" == capabilities.get("wurfl_id"))
+    _client.destroyConnection()
+  }
+
+  it should "return a generic device if a null or empty header map is provided " in {
+    _client = createTestClient()
+    var device = _client.lookupHeaders(null)
+    assert(device != null)
+    var capabilities = device.capabilities
+    assert(capabilities != null)
+    assert("generic" == capabilities.get("wurfl_id"))
+
+    device = _client.lookupHeaders(new util.HashMap[String,String]())
+    assert(device != null)
+    capabilities = device.capabilities
+    assert(capabilities != null)
+    assert("generic" == capabilities.get("wurfl_id"))
+    _client.destroyConnection()
+  }
+
+  it should "return a generic device when a http request without headers is provided and a capability filter is used" in {
+    _client = createTestClient()
+    try {
+      val reqCaps = Array("brand_name", "is_wireless_device", "pointing_method", "model_name")
+      _client.setRequestedCapabilities(reqCaps)
+      // Create request to pass
+      val device = _client.lookupRequest(createTestRequest(false))
+      assert(device != null)
+      assert(device.capabilities.get("wurfl_id") == "generic")
+    } catch {
+      case e: WmException =>
+        fail(e.getMessage)
+    } finally _client.setRequestedCapabilities(null)
+  }
+
+  it should "throw an exception when a null request is passed as input " in {
+    _client = createTestClient()
+    val caught =
+      intercept[WmException] {
+        _client.lookupRequest(null)
+      }
+    assert(caught.getMessage.contains("HttpServletRequest cannot be null") != null)
   }
 
   def createTestRequest(provideHeaders: Boolean): HttpServletRequest = {
