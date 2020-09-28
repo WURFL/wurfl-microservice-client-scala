@@ -404,6 +404,20 @@ class WmClientTest extends AnyFlatSpec with Matchers {
     _client.destroyConnection()
   }
 
+  it should "set cache size" in {
+    _client = createTestClient()
+    _client.setCacheSize(1000)
+    var cacheSizes = _client.getActualCacheSizes()
+    assert(cacheSizes(0) == 0)
+    assert(cacheSizes(1) == 0)
+    _client.lookupDeviceId("samsung_sm_a105f_ver1_subuan")
+    cacheSizes = _client.getActualCacheSizes()
+    assert(cacheSizes != null)
+    assert(cacheSizes(0) == 1)
+    assert(cacheSizes(1) == 0)
+    _client.destroyConnection()
+  }
+
 
   def createTestRequest(provideHeaders: Boolean): HttpServletRequest = {
 
