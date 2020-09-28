@@ -12,9 +12,20 @@ limitations under the License.
 */
 package com.scientiamobile.wurfl.wmclient.scala
 
+import java.io.{BufferedReader, UnsupportedEncodingException}
+import java.security.Principal
+import java.util.Locale
+
+import javax.servlet.{RequestDispatcher, ServletInputStream}
+import javax.servlet.http.{Cookie, HttpServletRequest, HttpSession}
+import org.apache.commons.collections.MapUtils
+import org.apache.commons.collections.iterators.{EmptyIterator, IteratorEnumeration}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
 import org.testng.annotations.{BeforeClass, Test}
+
+import scala.collection.immutable.HashMap
+import scala.collection.mutable
 
 @Test
 class WmClientTest extends AnyFlatSpec with Matchers {
@@ -195,6 +206,9 @@ class WmClientTest extends AnyFlatSpec with Matchers {
         exc = true
         assert(e.getMessage.contains("device is missing"))
     }
+    finally {
+      _client.destroyConnection()
+    }
   }
 
     it should "return an exception if a null wurfl_id is passed to lookupDeviceId " in {
@@ -206,5 +220,166 @@ class WmClientTest extends AnyFlatSpec with Matchers {
           exc = true
           assert(e.getMessage.contains("device is missing"))
       }
+      finally {
+        _client.destroyConnection()
+      }
     }
+
+  it should "perform a device detection using a HttpServletRequest object as input" in {
+
+    _client = createTestClient()
+    val request = createTestRequest(true)
+    val device = _client.lookupRequest(request)
+    assert(device!= null)
+    val capabilities = device.capabilities
+    assert(capabilities != null)
+    assert(capabilities.size >= 40)
+    assert("Smart-TV" == capabilities.get("form_factor"))
+    assert("5.1.0.13341" == capabilities.get("advertised_browser_version"))
+    assert("false" == capabilities.get("is_app"))
+    assert("false" == capabilities.get("is_app_webview"))
+    assert("Nintendo" == capabilities.get("advertised_device_os"))
+    assert("Nintendo Switch" == capabilities.get("complete_device_name"))
+    assert("nintendo_switch_ver1" == capabilities.get("wurfl_id"))
+  }
+
+  def createTestRequest(provideHeaders: Boolean): HttpServletRequest = {
+
+    new HttpServletRequest() {
+      private val headers = new java.util.HashMap[String,String]
+      private val ua = "Mozilla/5.0 (Nintendo Switch; WebApplet) AppleWebKit/601.6 (KHTML, like Gecko) NF/4.0.0.5.9 NintendoBrowser/5.1.0.13341"
+      private val xucbr = "Mozilla/5.0 (Nintendo Switch; ShareApplet) AppleWebKit/601.6 (KHTML, like Gecko) NF/4.0.0.5.9 NintendoBrowser/5.1.0.13341"
+      private val dstkUa = "Mozilla/5.0 (Nintendo Switch; WifiWebAuthApplet) AppleWebKit/601.6 (KHTML, like Gecko) NF/4.0.0.5.9 NintendoBrowser/5.1.0.13341"
+
+      override def getAuthType: String = null
+
+      override def getCookies = new Array[Cookie](0)
+
+      override def getDateHeader(s: String) = 0
+
+      override def getHeader(key: String): String = {
+        fillHeadersIfNeeded()
+        headers.get(key.toLowerCase)
+      }
+
+      private def fillHeadersIfNeeded(): Unit = { // all headers are put lowercase to emulate real http servlet request behaviour
+        if (MapUtils.isEmpty(headers) && provideHeaders) {
+          headers.put("User-Agent".toLowerCase, ua)
+          headers.put("Content-Type".toLowerCase, "gzip, deflate")
+          headers.put("Accept-Encoding".toLowerCase, "application/json")
+          headers.put("X-UCBrowser-Device-UA".toLowerCase, xucbr)
+          headers.put("Device-Stock-UA".toLowerCase, dstkUa)
+        }
+      }
+
+      override def getHeaders(s: String): IteratorEnumeration = {
+        if (provideHeaders) {
+          fillHeadersIfNeeded()
+          return new IteratorEnumeration(headers.keySet.iterator)
+        }
+        new IteratorEnumeration(EmptyIterator.INSTANCE)
+      }
+
+      override def getHeaderNames: IteratorEnumeration = {
+        fillHeadersIfNeeded()
+        new IteratorEnumeration(headers.keySet.iterator)
+      }
+
+      override def getIntHeader(s: String) = 0
+
+      override def getMethod: String = null
+
+      override def getPathInfo: String = null
+
+      override def getPathTranslated: String = null
+
+      override def getContextPath: String = null
+
+      override def getQueryString: String = null
+
+      override def getRemoteUser: String = null
+
+      override def isUserInRole(s: String) = false
+
+      override def getUserPrincipal: Principal = null
+
+      override def getRequestedSessionId: String = null
+
+      override def getRequestURI: String = null
+
+      override def getRequestURL: StringBuffer = null
+
+      override def getServletPath: String = null
+
+      override def getSession(b: Boolean): HttpSession = null
+
+      override def getSession: HttpSession = null
+
+      override def isRequestedSessionIdValid = false
+
+      override def isRequestedSessionIdFromCookie = false
+
+      override def isRequestedSessionIdFromURL = false
+
+      override def isRequestedSessionIdFromUrl = false
+
+      override def getAttribute(s: String): String = null
+
+      override def getAttributeNames: java.util.Enumeration[_] = null
+
+      override def getCharacterEncoding: String = null
+
+      override def setCharacterEncoding(s: String): Unit = {}
+
+      override def getContentLength = 0
+
+      override def getContentType: String = null
+
+      override def getInputStream: ServletInputStream = null
+
+      override def getParameter(s: String): String = null
+
+      override def getParameterNames: java.util.Enumeration[_] = null
+
+      override def getParameterValues(s: String) = new Array[String](0)
+
+      override def getParameterMap: java.util.Map[_, _] = null
+
+      override def getProtocol: String = null
+
+      override def getScheme: String = null
+
+      override def getServerName: String = null
+
+      override def getServerPort = 0
+
+      override def getReader: BufferedReader = null
+
+      override def getRemoteAddr: String = null
+
+      override def getRemoteHost: String = null
+
+      override def setAttribute(s: String, o: Any): Unit = { }
+
+      override def removeAttribute(s: String): Unit = { }
+
+      override def getLocale: Locale = null
+
+      override def getLocales: java.util.Enumeration[_] = null
+
+      override def isSecure = false
+
+      override def getRequestDispatcher(s: String): RequestDispatcher = null
+
+      override def getRealPath(s: String): String = null
+
+      override def getRemotePort = 0
+
+      override def getLocalName: String = null
+
+      override def getLocalAddr: String = null
+
+      override def getLocalPort = 0
+    }
+  }
 }
