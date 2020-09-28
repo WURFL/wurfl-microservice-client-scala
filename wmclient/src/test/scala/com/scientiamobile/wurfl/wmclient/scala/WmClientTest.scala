@@ -17,6 +17,7 @@ import java.security.Principal
 import java.util
 import java.util.Locale
 
+import com.scientiamobile.wurfl.wmclient.Model
 import javax.servlet.{RequestDispatcher, ServletInputStream}
 import javax.servlet.http.{Cookie, HttpServletRequest, HttpSession}
 import org.apache.commons.collections.MapUtils
@@ -321,7 +322,88 @@ class WmClientTest extends AnyFlatSpec with Matchers {
         _client.lookupRequest(null)
       }
     assert(caught.getMessage.contains("HttpServletRequest cannot be null") != null)
+    _client.destroyConnection()
   }
+
+
+  it should "return true if has a static capability, false otherwise" in {
+    _client = createTestClient()
+    assert(_client.hasStaticCapability("brand_name"))
+    assert(_client.hasStaticCapability("model_name"))
+    assert(_client.hasStaticCapability("is_smarttv"))
+    // this is a virtual capability, so it shouldn't be returned
+    assert(!_client.hasStaticCapability("is_app"))
+    _client.destroyConnection()
+  }
+
+  it should "return true if has a virtual capability, false otherwise" in {
+    _client = createTestClient()
+    assert(_client.hasVirtualCapability("is_app"))
+    assert(_client.hasVirtualCapability("is_smartphone"))
+    assert(_client.hasVirtualCapability("form_factor"))
+    assert(_client.hasVirtualCapability("is_app_webview"))
+    // this is a static capability, so it shouldn't be returned
+    assert(!_client.hasVirtualCapability("brand_name"))
+    assert(!_client.hasVirtualCapability("is_wireless_device"))
+    _client.destroyConnection()
+  }
+
+  it should "set the requested static and/or virtual capabilities to be downloaded on each request " in {
+    _client = createTestClient()
+    _client.setRequestedStaticCapabilities(Array[String]("wrong1", "brand_name", "is_ios"))
+    _client.setRequestedVirtualCapabilities(Array[String]("wrong2", "brand_name", "is_ios"))
+
+    val ua = "Mozilla/5.0 (iPhone; CPU iPhone OS 10_2_1 like Mac OS X) AppleWebKit/602.4.6 (KHTML, like Gecko) Version/10.0 Mobile/14D27 Safari/602.1"
+    var d = _client.lookupUseragent(ua)
+    assert(d != null)
+    assert(d.capabilities.size == 3)
+    assert(d.capabilities.get("wrong1") == null)
+
+    // This will reset static caps
+    _client.setRequestedStaticCapabilities(null)
+    d = _client.lookupUseragent(ua)
+    assert(d.capabilities.size == 2)
+    // If all required caps arrays are reset, ALL caps are returned
+    _client.setRequestedVirtualCapabilities(null)
+    d = _client.lookupUseragent(ua)
+    val capsize = d.capabilities.size
+    assert(capsize >= 40)
+    _client.destroyConnection()
+  }
+
+  it should "download all device makers" in {
+    _client = createTestClient()
+    val makes = _client.getAllDeviceMakes()
+    assert(makes != null)
+    assert(makes.length > 2000)
+  }
+
+  it should "get all models for the given input maker name" in {
+      val modelMktNames = _client.getAllDevicesForMake("Nokia")
+      assert(modelMktNames != null)
+      assert(modelMktNames.length > 700)
+      assert(modelMktNames(0).modelName != null)
+      assert(modelMktNames(5).marketingName != null)
+
+      for (md <- modelMktNames) {
+        assert(md != null)
+      }
+    }
+
+  it should "download al device OSes" in {
+    val oses = _client.getAllOSes()
+    assert(oses != null)
+    assert(oses.length >= 30)
+  }
+
+  it should "return all version numbers for a given device OS name " in {
+    val osVersions = _client.getAllVersionsForOS("Android")
+    assert(osVersions != null)
+    assert(osVersions.length > 30)
+    assert(osVersions(0) != null )
+    _client.destroyConnection()
+  }
+
 
   def createTestRequest(provideHeaders: Boolean): HttpServletRequest = {
 
