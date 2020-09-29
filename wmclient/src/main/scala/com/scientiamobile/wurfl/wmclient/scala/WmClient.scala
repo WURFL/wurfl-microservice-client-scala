@@ -29,56 +29,55 @@ class WmClient(private var wmjclient: com.scientiamobile.wurfl.wmclient.WmClient
   def lookupUseragent(userAgent: String): Model#JSONDeviceData = wmjclient.lookupUseragent(userAgent)
 
   /**
-   * Performs a device detection using an HTTP request object, as passed from Java Web applications
+   * Performs a device detection using an HTTP request object, as passed from Java Web applications.
+   * Throws WmException In case a connection error occurs, malformed data are sent, or the given brand name parameter does not exist in WM server.
    *
    * @param request an instance of HTTPServletRequest
    * @return An object containing the device capabilities
-   * @throws WmException In case any error occurs during device detection
    */
   def lookupRequest(request: HttpServletRequest): Model#JSONDeviceData = wmjclient.lookupRequest(request)
 
   /**
-   * @return A JSONInfoData instance holding the capabilities exposed from WM server, the headers used for device detection, WURFL file and API version
-   * @throws WmException If server cannot send data or incomplete data are sent
+   * @return A JSONInfoData instance holding the capabilities exposed from WM server, the headers used for device detection, WURFL file and API version.
+   *         Throws WmException In case a connection error occurs, malformed data are sent, or the given brand name parameter does not exist in WM server.
    */
   def getInfo(): Model#JSONInfoData = wmjclient.getInfo
 
   /**
-   * Returns the device matching the given WURFL ID
+   * Returns the device matching the given WURFL ID.
+   * Throws WmException In case a connection error occurs, malformed data are sent, or the given brand name parameter does not exist in WM server.
    *
    * @param deviceId a WURFL device identifier
    * @return An object containing the device capabilities
-   * @throws WmException In case any error occurs
    */
   def lookupDeviceId(deviceId:String): Model#JSONDeviceData = wmjclient.lookupDeviceId(deviceId)
 
   /**
    * Performs a device detection using a map containing the http request headers.
    * Headers are handled as case insensitive (ie: header name "User-Agent" is equal to "UsEr-aGent")
+   * Throws WmException In case a connection error occurs, malformed data are sent, or the given brand name parameter does not exist in WM server.
    *
    * @param headers an instance of HTTPServletRequest
    * @return An object containing the device capabilities
-   * @throws WmException In case any error occurs during device detection
    */
   def lookupHeaders (headers: util.Map[String, String]): Model#JSONDeviceData = wmjclient.lookupHeaders(headers)
 
   /**
-   * @return getAllDeviceMakes returns a string array of all devices brand_name capabilities in WM server
-   * @throws WmException In case a connection error occurs or malformed data are sent
+   * @return getAllDeviceMakes returns a string array of all devices brand_name capabilities in WM server. Throws WmException In case a connection error occurs, malformed data are sent,
+   *         or the given brand name parameter does not exist in WM server.
    */
   def getAllDeviceMakes(): Array[String] = wmjclient.getAllDeviceMakes
 
   /**
    * @param make a brand name
-   * @return An array of {@link com.scientiamobile.wurfl.wmclient.Model#JSONModelMktName} that contain values for model_name
-   *         and marketing_name (the latter, if available).
-   * @throws WmException In case a connection error occurs, malformed data are sent, or the given brand name parameter does not exist in WM server.
+   * @return An array of com.scientiamobile.wurfl.wmclient.Model#JSONModelMktName (exposed by Java client API) that contain values for model_name
+   *         and marketing_name (the latter, if available). Throws WmException In case a connection error occurs, malformed data are sent, or the given brand name parameter does not exist in WM server.
    */
   def getAllDevicesForMake(make: String): Array[Model#JSONModelMktName] = wmjclient.getAllDevicesForMake(make)
 
   /**
-   * @return an array of all devices device_os capabilities in WM server
-   * @throws WmException In case a connection error occurs or malformed data are sent
+   * @return an array of all devices device_os capabilities in WM server. Throws WmException In case a connection error occurs, malformed data are sent,
+   *         or the given brand name parameter does not exist in WM server.
    */
   def getAllOSes(): Array[String] = wmjclient.getAllOSes
 
@@ -86,8 +85,8 @@ class WmClient(private var wmjclient: com.scientiamobile.wurfl.wmclient.WmClient
    * returns a slice
    *
    * @param osName a device OS name
-   * @return an array containing device_os_version for the given os_name
-   * @throws WmException In case a connection error occurs or malformed data are sent
+   * @return an array containing device_os_version for the given os_name. Throws WmException In case a connection error occurs, malformed data are sent,
+   *         or the given brand name parameter does not exist in WM server.
    */
   def getAllVersionsForOS(osName: String): Array[String] = wmjclient.getAllVersionsForOS(osName)
 
@@ -125,9 +124,8 @@ class WmClient(private var wmjclient: com.scientiamobile.wurfl.wmclient.WmClient
 
   /**
    * Deallocates all resources used by client. All subsequent usage of client will result in a WmException (you need to create the client again
-   * with a call to WmClient.apply.
+   * with a call to WmClient.apply. Throws WmException In case a connection error occurs, malformed data are sent, or the given brand name parameter does not exist in WM server.
    *
-   * @throws WmException In case of closing connection errors.
    */
   def destroyConnection() = wmjclient.destroyConnection
 

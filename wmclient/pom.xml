@@ -215,15 +215,15 @@
                             </execution>
                         </executions>
                     </plugin>
-
                     <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <groupId>net.alchim31.maven</groupId>
+                        <artifactId>scala-maven-plugin</artifactId>
+                        <version>4.4.0</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
-                                <phase>package</phase>
                                 <goals>
-                                    <goal>jar</goal>
+                                    <goal>doc-jar</goal>
                                 </goals>
                             </execution>
                         </executions>
