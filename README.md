@@ -2,7 +2,7 @@
 
 WURFL Microservice (by ScientiaMobile, Inc.) is a mobile device detection service that can quickly and accurately detect over 500 capabilities of visiting devices. It can differentiate between portable mobile devices, desktop devices, SmartTVs and any other types of devices that have a web browser.
 
-This is the Scala Client API for accessing the WURFL Microservice. The Scala works as a wrapper of the Java client API on which it depends (see the sbt or maven build files). 
+This is the Scala Client API for accessing the WURFL Microservice. The Scala client works as a [wrapper of the Java client API](https://github.com/WURFL/wurfl-microservice-client-java) on which it depends (see the sbt or maven build files). 
 The API is released under Open-Source and can be integrated with other open-source or proprietary code. In order to operate, it requires access to a running instance of the WURFL Microservice product, such as:
 
 - WURFL Microservice for Docker: https://www.scientiamobile.com/products/wurfl-microservice-docker-detect-device/
