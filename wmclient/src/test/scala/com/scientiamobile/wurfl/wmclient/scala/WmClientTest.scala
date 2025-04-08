@@ -111,14 +111,14 @@ class WmClientTest extends AnyFlatSpec with Matchers {
 
   it should "perform a device detection using a User-Agent as input" in {
     _client = createTestClient()
-    val ua = "Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-G950F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.2 Chrome/51.0.2704.106 Mobile Safari/537.36"
+    val ua = "Mozilla/5.0 (Linux; Android 14; SM-S921N Build/UP1A.231005.007; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/134.0.6998.135 Mobile Safari/537.36 DaumApps/8.1.2 DaumDevice/mobile"
     val device = _client.lookupUseragent(ua)
     assert(device != null)
     val capabilities = device.capabilities
     val dcount = capabilities.size
     assert(dcount >= 40)
 
-    assert("SM-G950F" == capabilities.get("model_name"))
+    assert("SM-S921N" == capabilities.get("model_name"))
     assert("true" == capabilities.get("is_smartphone"))
     assert("false" == capabilities.get("is_smarttv"))
     _client.destroyConnection()
