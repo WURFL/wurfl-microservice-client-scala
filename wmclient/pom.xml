@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.scientiamobile.wurflmicroservice</groupId>
     <artifactId>wurfl-microservice-scala</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
     <packaging>jar</packaging>
 
     <name>wurfl-microservice-scala</name>
@@ -15,6 +15,16 @@
         <name>ScientiaMobile Inc.</name>
         <url>http://www.scientiamobile.com</url>
     </organization>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <scm>
+        <connection>scm:git:git://github.com/WURFL/wurfl-microservice-client-java.git</connection>
+        <developerConnection>scm:git:ssh://github.com:WURFL/wurfl-microservice-client-java.git</developerConnection>
+        <url>https://github.com/WURFL/wurfl-microservice-client-java/tree/master</url>
+    </scm>
 
     <licenses>
         <license>
@@ -45,13 +55,13 @@
         <dependency>
             <groupId>com.scientiamobile.wurflmicroservice</groupId>
             <artifactId>wurfl-microservice</artifactId>
-            <version>2.1.0</version>
+            <version>2.1.8</version>
         </dependency>
 
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>2.13.3</version>
+            <version>2.13.16</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -80,6 +90,17 @@
         <sourceDirectory>src/main/scala</sourceDirectory>
         <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
+
+            <!-- plugin required for publishing to the new Maven Central Portal -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
@@ -178,6 +199,16 @@
             <id>release</id>
             <build>
                 <plugins>
+                    <!-- plugin required for publishing to the new Maven Central Portal -->
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                        </configuration>
+                    </plugin>
 
                     <!-- check for license header in all (but excluded) files -->
                     <plugin>
@@ -196,10 +227,9 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>2.0.2</version>
+                        <version>3.13.0</version>
                         <configuration>
-                            <source>1.8</source>
-                            <target>1.8</target>
+                            <release>11</release>
                             <encoding>UTF-8</encoding>
                         </configuration>
                     </plugin>

@@ -14,7 +14,9 @@ The API is released under Open-Source and can be integrated with other open-sour
 - WURFL Microservice for Google Cloud Platform: https://www.scientiamobile.com/products/wurfl-microservice-for-gcp/
 
 Scala implementation of the WM Client api.
-Requires Scala 2.13 and Java 8 or above.
+Requires:
+    - Scala 2.13 and Java 11 or above (from version 2.1.1).
+    - Scala 2.13 and Java 8 or above (until version 2.1.0).
 
 The Example project contains an example of client api usage for a console application :
 
