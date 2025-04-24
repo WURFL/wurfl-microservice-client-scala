@@ -73,7 +73,7 @@ class WmClient(private var wmjclient: com.scientiamobile.wurfl.wmclient.WmClient
    * @return An array of com.scientiamobile.wurfl.wmclient.Model#JSONModelMktName (exposed by Java client API) that contain values for model_name
    *         and marketing_name (the latter, if available). Throws WmException In case a connection error occurs, malformed data are sent, or the given brand name parameter does not exist in WM server.
    */
-  def getAllDevicesForMake(make: String): Array[Model#JSONModelMktName] = wmjclient.getAllDevicesForMake(make)
+  def getAllDevicesForMake(make: String): Array[com.scientiamobile.wurfl.wmclient.Model.JSONModelMktName] = wmjclient.getAllDevicesForMake(make)
 
   /**
    * @return an array of all devices device_os capabilities in WM server. Throws WmException In case a connection error occurs, malformed data are sent,

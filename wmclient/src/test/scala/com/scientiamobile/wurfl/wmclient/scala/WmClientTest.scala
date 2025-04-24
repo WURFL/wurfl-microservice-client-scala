@@ -20,8 +20,8 @@ import java.util.Locale
 import com.scientiamobile.wurfl.wmclient.Model
 import javax.servlet.{RequestDispatcher, ServletInputStream}
 import javax.servlet.http.{Cookie, HttpServletRequest, HttpSession}
-import org.apache.commons.collections.MapUtils
-import org.apache.commons.collections.iterators.{EmptyIterator, IteratorEnumeration}
+import org.apache.commons.collections4.MapUtils
+import org.apache.commons.collections4.iterators.{EmptyIterator, IteratorEnumeration}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
 import org.testng.annotations.{BeforeClass, Test}
@@ -33,7 +33,7 @@ import scala.collection.mutable
 class WmClientTest extends AnyFlatSpec with Matchers {
 
   import com.scientiamobile.wurfl.wmclient.WmException
-  import org.apache.commons.lang.StringUtils
+  import org.apache.commons.lang3.StringUtils
 
   var _client: WmClient = null
 
@@ -321,7 +321,7 @@ class WmClientTest extends AnyFlatSpec with Matchers {
       intercept[WmException] {
         _client.lookupRequest(null)
       }
-    assert(caught.getMessage.contains("HttpServletRequest cannot be null") != null)
+    assert(caught.getMessage.contains("HttpServletRequest cannot be null"))
     _client.destroyConnection()
   }
 
@@ -448,17 +448,17 @@ class WmClientTest extends AnyFlatSpec with Matchers {
         }
       }
 
-      override def getHeaders(s: String): IteratorEnumeration = {
+      override def getHeaders(s: String): IteratorEnumeration[String] = {
         if (provideHeaders) {
           fillHeadersIfNeeded()
-          return new IteratorEnumeration(headers.keySet.iterator)
+          return new IteratorEnumeration[String](headers.keySet.iterator)
         }
-        new IteratorEnumeration(EmptyIterator.INSTANCE)
+        new IteratorEnumeration[String](EmptyIterator.INSTANCE.asInstanceOf[java.util.Iterator[String]])
       }
 
-      override def getHeaderNames: IteratorEnumeration = {
+      override def getHeaderNames: IteratorEnumeration[String] = {
         fillHeadersIfNeeded()
-        new IteratorEnumeration(headers.keySet.iterator)
+        new IteratorEnumeration[String](headers.keySet.iterator)
       }
 
       override def getIntHeader(s: String) = 0
