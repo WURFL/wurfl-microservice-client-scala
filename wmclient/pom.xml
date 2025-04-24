@@ -21,9 +21,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git://github.com/WURFL/wurfl-microservice-client-java.git</connection>
-        <developerConnection>scm:git:ssh://github.com:WURFL/wurfl-microservice-client-java.git</developerConnection>
-        <url>https://github.com/WURFL/wurfl-microservice-client-java/tree/master</url>
+        <connection>scm:git:git://github.com/WURFL/wurfl-microservice-client-scala.git</connection>
+        <developerConnection>scm:git:ssh://github.com:WURFL/wurfl-microservice-client-scala.git</developerConnection>
+        <url>https://github.com/WURFL/wurfl-microservice-client-scala/tree/master</url>
     </scm>
 
     <licenses>
