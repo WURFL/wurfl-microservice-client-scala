@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.scientiamobile.wurflmicroservice</groupId>
@@ -34,7 +35,6 @@
         </license>
     </licenses>
 
-    <!-- Developers -->
     <developers>
         <developer>
             <id>andrea</id>
@@ -48,10 +48,7 @@
         </developer>
     </developers>
 
-    <!-- Dependencies -->
     <dependencies>
-
-        <!-- WURFL Microservice Java API client -->
         <dependency>
             <groupId>com.scientiamobile.wurflmicroservice</groupId>
             <artifactId>wurfl-microservice</artifactId>
@@ -85,13 +82,11 @@
         </dependency>
     </dependencies>
 
-    <!-- Build -->
     <build>
         <sourceDirectory>src/main/scala</sourceDirectory>
         <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
 
-            <!-- plugin required for publishing to the new Maven Central Portal -->
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
@@ -122,51 +117,25 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
-                <executions>
-                    <execution>
-                        <id>scala-compile</id>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>testCompile</goal>
-                        </goals>
-                        <configuration>
-                            <args>
-
-                                <arg>-dependencyfile</arg>
-                                <arg>${project.build.directory}/.scala_dependencies</arg>
-                            </args>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- Only keep one Scala plugin. Removed the old org.scala-tools plugin -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
                 <executions>
-                    <!-- Override any default execution (like "default") to prevent duplication -->
-                    <execution>
-                        <id>default</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
                     <execution>
                         <id>attach-sources</id>
                         <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- disable surefire -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -176,8 +145,6 @@
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
-
-            <!-- enable scalatest -->
 
             <plugin>
                 <groupId>org.scalatest</groupId>
@@ -202,12 +169,10 @@
     </build>
 
     <profiles>
-
         <profile>
             <id>release</id>
             <build>
                 <plugins>
-                    <!-- plugin required for publishing to the new Maven Central Portal -->
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
@@ -218,7 +183,6 @@
                         </configuration>
                     </plugin>
 
-                    <!-- check for license header in all (but excluded) files -->
                     <plugin>
                         <groupId>com.mycila.maven-license-plugin</groupId>
                         <artifactId>maven-license-plugin</artifactId>
@@ -241,18 +205,24 @@
                             <encoding>UTF-8</encoding>
                         </configuration>
                     </plugin>
+
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
+                                <configuration>
+                                    <classifier>sources</classifier>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
+
                     <plugin>
                         <groupId>net.alchim31.maven</groupId>
                         <artifactId>scala-maven-plugin</artifactId>
@@ -266,13 +236,13 @@
                             </execution>
                         </executions>
                     </plugin>
+
                 </plugins>
             </build>
         </profile>
-
     </profiles>
-
 </project>
+
 
         <!--
                   Copyright (c) ScientiaMobile, Inc.
